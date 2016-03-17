@@ -1,0 +1,20 @@
+name: dask-funk-dev
+dependencies:
+- python=3.5
+- dask
+- notebook
+- pytest
+- flake8
+- toolz
+- pip:
+  # - flake8-print==2.0.2
+  # - flake8-todo==0.4
+  # - isort==4.2.2
+  # - mccabe==0.4.0
+  # - pep8==  # - pep8-naming==0.3.3
+  # - pyflakes==1.0.0
+  - pytest-benchmark==3.0.0
+  - pytest-cache==1.0
+  - pytest-flake8==0.2
+  - pytest-isort==0.1.0
+  - pytest-xdist
