@@ -2,7 +2,7 @@
 
 from os.path import exists
 from setuptools import setup
-import daskfunk.__info as di
+import daskfunk._info as di
 
 setup(
     name='dask-funk',
