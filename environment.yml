@@ -2,6 +2,8 @@ name: dask-funk-dev
 dependencies:
 - python=3.5
 - dask
+# this package appears to be broke on OSx
+#- graphviz
 - notebook
 - pytest
 - flake8
@@ -18,3 +20,4 @@ dependencies:
   - pytest-flake8==0.2
   - pytest-isort==0.1.0
   - pytest-xdist
+  - graphviz

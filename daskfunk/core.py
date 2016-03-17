@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 from collections import OrderedDict
+from itertools import repeat
 
 import dask.core as dc
 import toolz as t
@@ -24,7 +25,7 @@ def _param_info(argspec):
     return OrderedDict(zip(params, values))
 
 
-def compile(fn_graph):
+def compile(fn_graph, get=dc.get):
     fn_param_info = t.valmap(t.compose(_param_info, getargspec), fn_graph)
     global_param_info = t.merge_with(set, *fn_param_info.values())
     computed_args = set(fn_graph.keys())
@@ -48,7 +49,7 @@ def compile(fn_graph):
 
     outputs = list(fn_graph.keys())
 
-    def funk(get=dc.get, **kargs):
+    def funk(get=get, **kargs):
         param_keys = set(kargs.keys())
         missing_keys = required_params - param_keys
         if missing_keys:
@@ -65,5 +66,9 @@ def compile(fn_graph):
 
     funk.required = required_params
     funk.defaults = default_args
+    funk.base_dask = base_dask
+    funk.full_dask = t.merge(base_dask,
+                             dict(zip(all_params,
+                                      repeat(_UNSPECIFIED))))
 
     return funk
