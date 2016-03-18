@@ -1,11 +1,13 @@
 from __future__ import absolute_import, division, print_function
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from itertools import repeat
+from functools import singledispatch
 
 import dask.core as dc
 import toolz as t
 import toolz.curried as tc
+import cytoolz.curried as cyt
 
 import daskfunk.utils as u
 from daskfunk.compatibility import getargspec
@@ -16,7 +18,7 @@ def _is_required(defaults):
     return len(defaults) > 1 or _UNSPECIFIED in defaults
 
 
-def _param_info(argspec):
+def _func_param_info(argspec):
     params = argspec.args
     defaults = argspec.defaults or []
     start_default_ix = -max(len(defaults), 1) - 1
@@ -25,8 +27,26 @@ def _param_info(argspec):
     return OrderedDict(zip(params, values))
 
 
+def _is_curry_func(f):
+    """
+    Checks if f is a toolz or cytoolz function by inspecting the available attributes.
+    Avoids explicit type checking to accommodate all versions of the curry fn.
+    """
+    return hasattr(f, 'func') and hasattr(f, 'args') and hasattr(f, 'keywords')
+
+
+def _param_info(f):
+    if _is_curry_func(f):
+        argspec = getargspec(f.func)
+        num_args = len(f.args)
+        args_to_remove = argspec.args[0:num_args] + list(f.keywords.keys())
+        base = _func_param_info(argspec)
+        return t.dissoc(base, *args_to_remove)
+    return(_func_param_info(getargspec(f)))
+
+
 def compile(fn_graph, get=dc.get):
-    fn_param_info = t.valmap(t.compose(_param_info, getargspec), fn_graph)
+    fn_param_info = t.valmap(_param_info, fn_graph)
     global_param_info = t.merge_with(set, *fn_param_info.values())
     computed_args = set(fn_graph.keys())
     required_params, defaulted = u.split_keys_by_val(_is_required,

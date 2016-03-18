@@ -1,3 +1,7 @@
+from collections import OrderedDict
+import toolz as t
+import cytoolz as cyt
+
 import daskfunk.core as dfc
 
 def load_data(filename):
@@ -26,3 +30,73 @@ def test_compile():
                    'inc5': [6, 7, 8],
                    'inc10': [11, 12, 13],
                    'res': ('foo-bar', [17, 19, 21])}
+
+
+def test_param_info_regular_function():
+    def foo(a, b, c='bar'):
+        return a + b
+
+    res = dfc._param_info(foo)
+    assert res == OrderedDict([('a', '::unspecified::'),
+                               ('b', '::unspecified::'),
+                               ('c', 'bar')])
+
+def test_param_info_curried_function():
+
+    @t.curry
+    def foo(a, b, c='bar'):
+        return a + b
+
+    res = dfc._param_info(foo)
+    assert res == OrderedDict([('a', '::unspecified::'),
+                               ('b', '::unspecified::'),
+                               ('c', 'bar')])
+
+def test_param_info_positional_curried_function():
+
+    @t.curry
+    def foo(a, b, c='bar'):
+        return a + b
+
+    myfoo = foo(5)
+    res = dfc._param_info(myfoo)
+    assert res == OrderedDict([('b', '::unspecified::'),
+                               ('c', 'bar')])
+
+
+def test_param_info_keyword_curried_function():
+
+    @t.curry
+    def foo(a, b, c='bar'):
+        return a + b
+
+    myfoo = foo(c='baz')
+
+    res = dfc._param_info(myfoo)
+    assert res == OrderedDict([('a', '::unspecified::'),
+                               ('b', '::unspecified::')])
+
+
+def test_param_info_nested_curried_function():
+
+    @t.curry
+    def foo(a, b, c='bar'):
+        return a + b
+
+    myfoo = foo(c='baz')
+    another_foo = myfoo(55)
+
+    res = dfc._param_info(another_foo)
+    assert res == OrderedDict([('b', '::unspecified::')])
+
+def test_param_info_with_cytoolz_curry():
+
+    @cyt.curry
+    def foo(a, b, c='bar'):
+        return a + b
+
+    myfoo = foo(c='baz')
+    another_foo = myfoo(55)
+
+    res = dfc._param_info(another_foo)
+    assert res == OrderedDict([('b', '::unspecified::')])
