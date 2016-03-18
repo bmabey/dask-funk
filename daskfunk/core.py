@@ -61,7 +61,13 @@ def compile(fn_graph, get=dc.get):
     def to_task(res_key, param_info):
         fn = fn_graph[res_key]
         args = tuple([default_args.get(p, p) for p in param_info.keys()])
-        task = (fn,) + args
+        # this wrapper fn is needed to all args can be passed as
+        # kargs, see test_graph_with_curried_fn_with_later_kwarg_provided
+        # for motivation
+        def wrapper(*args):
+            kwargs = dict(zip(param_info.keys(), args))
+            return fn(**kwargs)
+        task = (wrapper,) + args
         return task
 
     base_dask = {k:to_task(k, param_info)
