@@ -1,8 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from itertools import repeat
-from functools import singledispatch
 
 import dask.core as dc
 import toolz as t
