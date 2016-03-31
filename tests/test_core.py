@@ -36,6 +36,52 @@ def test_compile():
                    'res': ('foo-bar', [17, 19, 21])}
 
 
+def test_compile_with_unhashable_types_as_defaults():
+    def load_data(filename):
+        return [1,2,3]
+
+    def process_data(data, opts={'foo': 42}, nums=set([4,5])):
+        return [i + 5 for i in data]
+
+    fn_graph = {'data': load_data,
+                'inc5': process_data,}
+
+    funk = dfc.compile(fn_graph)
+
+    res = funk(filename='foo-bar')
+
+    assert res == {'data': [1,2,3],
+                   'inc5': [6, 7, 8]}
+
+
+def test_intermediate_values_are_reused():
+    times_loaded = 0
+    def load_data(filename):
+        nonlocal times_loaded
+        print('data is being loaded!')
+        times_loaded += 1
+        return [1,2,3]
+
+    def process_data_A(data):
+        return [i + 5 for i in data]
+
+    def process_data_B(data):
+        return [i + 10 for i in data]
+
+    def combine_processed_data(filename, inc5, inc10):
+        return filename, [a + b for a, b in zip(inc5, inc10)]
+
+    fn_graph = {'data': load_data,
+                'inc5': process_data_A,
+                'inc10': process_data_B,
+                'res': combine_processed_data}
+    funk = dfc.compile(fn_graph)
+
+    res = funk(filename='foo-bar')
+
+    assert times_loaded == 1
+
+
 def test_graph_with_curried_fn_with_later_kwarg_provided():
     @t.curry
     def three_sum(a, b=5, c=3):

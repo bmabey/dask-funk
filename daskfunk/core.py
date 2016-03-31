@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from itertools import repeat
 
-import dask.core as dc
+import dask
 import toolz as t
 import toolz.curried as tc
 import cytoolz.curried as cyt
@@ -13,8 +13,9 @@ from daskfunk.compatibility import getargspec
 
 
 _UNSPECIFIED = '::unspecified::'
-def _is_required(defaults):
-    return len(defaults) > 1 or _UNSPECIFIED in defaults
+_AMBIGUOUS = '::ambiguous::'
+def _is_required(default):
+    return default == _UNSPECIFIED or default == _AMBIGUOUS
 
 
 def _func_param_info(argspec):
@@ -44,18 +45,22 @@ def _param_info(f):
     return(_func_param_info(getargspec(f)))
 
 
-def compile(fn_graph, get=dc.get):
+def compile(fn_graph, get=dask.get):
     fn_param_info = t.valmap(_param_info, fn_graph)
-    global_param_info = t.merge_with(set, *fn_param_info.values())
+    global_param_info = {}
+    for param_info in fn_param_info.values():
+        for kw, value in param_info.items():
+            if kw in global_param_info and global_param_info[kw] != value:
+                global_param_info = _AMBIGUOUS
+            else:
+                global_param_info[kw] = value
     computed_args = set(fn_graph.keys())
     required_params, defaulted = u.split_keys_by_val(_is_required,
                                                      global_param_info)
     required_params = required_params - computed_args
 
     all_params = required_params.union(defaulted)
-    default_args = t.thread_last(defaulted,
-                                 u.select_keys(global_param_info),
-                                 tc.valmap(lambda set: list(set)[0]))
+    default_args = u.select_keys(global_param_info, defaulted)
 
     def to_task(res_key, param_info):
         fn = fn_graph[res_key]
