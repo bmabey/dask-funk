@@ -4,6 +4,7 @@ from collections import OrderedDict, defaultdict
 from itertools import repeat
 
 import dask
+#from decorator import decorate
 import toolz as t
 import toolz.curried as tc
 import cytoolz.curried as cyt
@@ -44,6 +45,11 @@ def _param_info(f):
         return t.dissoc(base, *args_to_remove)
     return(_func_param_info(getargspec(f)))
 
+def _func_name(func):
+    if hasattr(func, 'func'):
+        return(_func_name(func.func))
+    else:
+        return func.__name__
 
 def compile(fn_graph, get=dask.get):
     fn_param_info = t.valmap(_param_info, fn_graph)
@@ -71,6 +77,9 @@ def compile(fn_graph, get=dask.get):
         def wrapper(*args):
             kwargs = dict(zip(param_info.keys(), args))
             return fn(**kwargs)
+        #TODO: wrapped = decorate(fn, wrapper)
+        # need to figure out how to make decorate work with curried functions
+        wrapper.__name__ = _func_name(fn)
         task = (wrapper,) + args
         return task
 
