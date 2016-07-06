@@ -2,11 +2,10 @@
 
 from os.path import exists
 from setuptools import setup
-import daskfunk._info as di
 
 setup(
     name='dask-funk',
-    version=di.__version__,
+    version="1.0.0",
     packages=('daskfunk',),
     install_requires=('dask>=0.8.0', 'toolz'),
     tests_require=('pytest', 'pytest-benchmark', 'pytest-flake8',
