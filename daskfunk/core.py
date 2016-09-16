@@ -51,6 +51,25 @@ def _func_name(func):
     else:
         return func.__name__
 
+def _partial_base_fn(partial_fn):
+    fn = partial_fn.func
+    if '__module__' not in dir(fn):
+        # for some reason the curry decorator nests the actual function
+        # metadata one level deeper
+        fn = fn.func
+    return fn
+
+def _partial_inputs(partial_fn):
+    pargs = partial_fn.args
+    pkargs = partial_fn.keywords
+    f = _partial_base_fn(partial_fn)
+    spec = getargspec(f)
+    num_named_args = len(spec.args)
+    unnamed_args = dict(zip(spec.args, pargs[0:num_named_args]))
+    varargs = pargs[num_named_args:]
+    kargs = t.merge(pkargs, unnamed_args)
+    return varargs, kargs
+
 def compile(fn_graph, get=dask.get):
     fn_param_info = t.valmap(_param_info, fn_graph)
     global_param_info = {}
@@ -70,18 +89,22 @@ def compile(fn_graph, get=dask.get):
 
     def to_task(res_key, param_info):
         fn = fn_graph[res_key]
-        args = tuple([default_args.get(p, p) for p in param_info.keys()])
-        # this wrapper fn is needed to all args can be passed as
-        # kargs, see test_graph_with_curried_fn_with_later_kwarg_provided
-        # for motivation
-        def wrapper(*args):
-            kwargs = dict(zip(param_info.keys(), args))
-            return fn(**kwargs)
-        #TODO: wrapped = decorate(fn, wrapper)
-        # need to figure out how to make decorate work with curried functions
-        wrapper.__name__ = _func_name(fn)
-        task = (wrapper,) + args
-        return task
+        dask_args = tuple(param_info.keys())
+        if _is_curry_func(fn):
+            # wrap the fn but persist the args, and kargs on it
+            args = tuple([default_args.get(p, p) for p in param_info.keys()])
+            set_varargs, set_kargs = _partial_inputs(fn)
+            def wrapper(*args):
+                kwargs = t.merge(set_kargs, dict(zip(param_info.keys(), args)))
+                return fn(*set_varargs, **kwargs)
+            wrapper.__name__= _func_name(fn)
+            # we maintain the curry/partial func info
+            wrapper.func = _func_name(fn)
+            wrapper.keywords = fn.keywords
+            wrapper.args = fn.args
+            return (wrapper,) + dask_args
+
+        return (fn,) + dask_args
 
     base_dask = {k:to_task(k, param_info)
                  for k, param_info in fn_param_info.items()}

@@ -35,6 +35,18 @@ def test_compile():
                    'inc10': [11, 12, 13],
                    'res': ('foo-bar', [17, 19, 21])}
 
+def test_defaults_can_be_overriden():
+
+   def three_sum(a, b=5, c=5):
+        return a + b + c
+
+    # note how we specify b
+   fn_graph = {'x': three_sum, 'inc': lambda x: x + 1}
+   funk = dfc.compile(fn_graph)
+
+   assert funk(a=1) == {'x': 11, 'inc': 12}
+   assert funk(a=1,b=2,c=3) == {'x': 6, 'inc': 7}
+
 
 def test_compile_with_unhashable_types_as_defaults():
     def load_data(filename):
@@ -85,16 +97,21 @@ def test_intermediate_values_are_reused():
 def test_graph_with_curried_fn_with_later_kwarg_provided():
     @t.curry
     def three_sum(a, b=5, c=3):
-        return a + b + c
+       return a + b + c
 
     # note how we specify b
-    fn_graph = {'x': three_sum(b=9),
+    fn_graph = {'x': three_sum(b=10),
                 'inc': lambda x: x + 1}
     funk = dfc.compile(fn_graph)
 
-    assert funk(a=1) == {'x': 13,
-                         'inc': 14}
+    assert funk.required == {'a'}
+    assert funk.defaults == {'c': 3}
 
+    assert funk(a=0) == {'x': 13,
+                         'inc':14}
+
+    assert funk(a=1, c=0) == {'x': 11,
+                              'inc': 12}
 
 def test_param_info_regular_function():
     def foo(a, b, c='bar'):
