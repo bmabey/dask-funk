@@ -5,7 +5,7 @@ dependencies:
 # this package appears to be broke on OSx
 #- graphviz
 - notebook
-- pytest
+- pytest=2.9.2
 - flake8
 - toolz
 - pip:
@@ -20,4 +20,5 @@ dependencies:
   - pytest-flake8==0.2
   - pytest-isort==0.1.0
   - pytest-xdist
+  - pytest-pythonpath
   - graphviz
