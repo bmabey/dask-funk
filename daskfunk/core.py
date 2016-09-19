@@ -133,4 +133,5 @@ def compile(fn_graph, get=dask.get):
                              dict(zip(all_params,
                                       repeat(_UNSPECIFIED))))
 
+    # TODO: use bolton's FunctionBuilder to set kargs so it has a useful function signature
     return funk
