@@ -2,6 +2,9 @@
 dask-funk
 ==========
 
+.. image:: https://travis-ci.org/Savvysherpa/dask-funk.svg?branch=master
+    :target: https://travis-ci.org/Savvysherpa/dask-funk
+
 dask-funk provides an extension to dask_ that creates keyword named functions
 (hence the funk!) from dasks_ or function graphs represented as dictionaries.
 It is inspired by Plumatic's wonderful Graph_ library for clojure.
