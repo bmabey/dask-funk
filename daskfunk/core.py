@@ -1,13 +1,10 @@
 from __future__ import absolute_import, division, print_function
 
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from itertools import repeat
 
 import dask
-#from decorator import decorate
 import toolz as t
-import toolz.curried as tc
-import cytoolz.curried as cyt
 
 import daskfunk.utils as u
 from daskfunk.compatibility import getargspec
