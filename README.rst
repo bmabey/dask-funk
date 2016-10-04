@@ -4,11 +4,11 @@ dask-funk
 
 dask-funk provides an extension to dask_ that creates keyword named functions
 (hence the funk!) from dasks_ or function graphs represented as dictionaries.
-The keyword functions returned from dask-funk ...
-
+It is inspired by Plumatic's wonderful Graph_ library for clojure.
 
 .. _dask: http://dask.pydata.org/en/latest/#
 .. _dasks: http://dask.pydata.org/en/latest/spec.html
+.. _Graph: https://github.com/plumatic/plumbing#graph-the-functional-swiss-army-knife
 
 Example
 =======
