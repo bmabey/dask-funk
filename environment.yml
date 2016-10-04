@@ -1,6 +1,7 @@
 name: dask-funk-dev
 dependencies:
 - python=3.5
+- cytoolz
 - dask
 # this package appears to be broke on OSx
 #- graphviz
