@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='dask-funk',
-    version="1.0.0",
+    version="0.9.0",
     packages=('daskfunk',),
     install_requires=('dask>=0.8.0', 'toolz'),
     tests_require=('pytest', 'pytest-benchmark', 'pytest-flake8',
