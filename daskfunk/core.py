@@ -37,7 +37,9 @@ def _param_info(f):
     if _is_curry_func(f):
         argspec = getargspec(f.func)
         num_args = len(f.args)
-        args_to_remove = argspec.args[0:num_args] + list(f.keywords.keys())
+        args_to_remove = argspec.args[0:num_args]
+        if f.keywords:
+            args_to_remove += list(f.keywords.keys())
         base = _func_param_info(argspec)
         return t.dissoc(base, *args_to_remove)
     return(_func_param_info(getargspec(f)))
