@@ -1,14 +1,16 @@
-
-# Config file for automatic testing at travis-ci.org
-
 language: python
+sudo: false
+
+env:
+  matrix:
+    - PYTHON=2.7
+    - PYTHON=2.7
+    - PYTHON=3.3
+    - PYTHON=3.4
+    - PYTHON=3.5
 
 
 before_install:
-  # conda instructions from http://conda.pydata.org/docs/travis.html
-  - sudo apt-get update
-  # We do this conditionally because it saves us some downloading if the
-  # version is the same.
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
     else
@@ -22,8 +24,10 @@ before_install:
   # Useful for debugging any issues with conda
   - conda info -a
 install:
-  - conda env create
-  - source activate dask-funk-dev
+  - conda create -n test-environment python=$PYTHON
+  - conda install -c conda-forge dask toolz cytoolz pytest
+  - source activate test-environment
+  - pip install pytest-pythonpath
 
 # command to run tests, e.g. python setup.py test
-script: py.test
+script: pytest
