@@ -3,9 +3,12 @@
 from os.path import exists
 from setuptools import setup
 
+import versioneer
+
 setup(
     name='dask-funk',
-    version="0.9.0",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     packages=('daskfunk',),
     setup_requires=['pytest-runner'],
     install_requires=('dask>=0.8.0', 'toolz>=0.8.0'),
@@ -16,11 +19,11 @@ setup(
                       else ''),
     author="Ben Mabey",
     author_email="ben@benmabey.com",
-    url="http://github.com/TBD/dask-funk",
+    url="http://github.com/Savvysherpa/dask-funk",
     license="MIT",
-    classifiers=(
+    classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.4",
-    ),
+    ],
 )
