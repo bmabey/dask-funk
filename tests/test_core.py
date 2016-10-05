@@ -3,6 +3,7 @@ import toolz as t
 import cytoolz as cyt
 
 import daskfunk.core as dfc
+from daskfunk.compatibility import PY3
 
 
 def inc(x):
@@ -67,12 +68,10 @@ def test_compile_with_unhashable_types_as_defaults():
 
 
 def test_intermediate_values_are_reused():
-    times_loaded = 0
+    times_loaded = {'total': 0}
     def load_data(filename):
-        nonlocal times_loaded
-        print('data is being loaded!')
-        times_loaded += 1
-        return [1,2,3]
+      times_loaded['total'] += 1
+      return [1,2,3]
 
     def process_data_A(data):
         return [i + 5 for i in data]
@@ -91,7 +90,7 @@ def test_intermediate_values_are_reused():
 
     res = funk(filename='foo-bar')
 
-    assert times_loaded == 1
+    assert times_loaded['total'] == 1
 
 
 def test_graph_with_curried_fn_with_later_kwarg_provided():
@@ -104,7 +103,7 @@ def test_graph_with_curried_fn_with_later_kwarg_provided():
                 'inc': lambda x: x + 1}
     funk = dfc.compile(fn_graph)
 
-    assert funk.required == {'a'}
+    assert funk.required == set(('a'))
     assert funk.defaults == {'c': 3}
 
     assert funk(a=0) == {'x': 13,

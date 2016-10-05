@@ -11,9 +11,9 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     packages=('daskfunk',),
     setup_requires=['pytest-runner'],
-    install_requires=('dask>=0.8.0', 'toolz>=0.8.0'),
-    tests_require=('pytest>=3.0.3', 'pytest-pythonpath', 'pytest-flake8',
-                   'pytest-isort', 'flake8-print', 'flake8-todo', 'pep8-naming'),
+    install_requires=('dask>=0.8.0', 'toolz>=0.7.4'),
+    tests_require=('pytest>=3.0.0', 'pytest-pythonpath', 'pytest-flake8', 'cytoolz>=0.7.4',
+                   'pytest-isort', 'pep8-naming'),
     description="Composable keyword function graphs",
     long_description=(open('README.rst').read() if exists('README.rst')
                       else ''),

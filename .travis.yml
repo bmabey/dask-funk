@@ -1,16 +1,15 @@
 language: python
 sudo: false
 
-env:
-  matrix:
-    - PYTHON=2.7
-    - PYTHON=2.7
-    - PYTHON=3.3
-    - PYTHON=3.4
-    - PYTHON=3.5
+python:
+  # We don't actually use the Travis Python, but this keeps it organized.
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
 
-
-before_install:
+install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
     else
@@ -23,11 +22,9 @@ before_install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
-install:
-  - conda create -n test-environment python=$PYTHON
-  - conda install -c conda-forge dask toolz cytoolz pytest
+  - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - pip install pytest-pythonpath
+  - python setup.py install
 
 # command to run tests, e.g. python setup.py test
-script: pytest
+script: python setup.py test

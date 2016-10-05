@@ -1,12 +1,11 @@
-name: dask-funk-dev
+name: dask-funk-dev-foo
 dependencies:
-- python=3.5
-- cytoolz
+- toolz
 - dask
 # this package appears to be broke on OSx
 #- graphviz
 - notebook
-- pytest=2.9.2
+- pytest
 - flake8
 - toolz
 - pip:
