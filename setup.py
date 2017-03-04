@@ -19,7 +19,7 @@ setup(
                       else ''),
     author="Ben Mabey",
     author_email="ben@benmabey.com",
-    url="http://github.com/Savvysherpa/dask-funk",
+    url="http://github.com/bmabey/dask-funk",
     license="MIT",
     classifiers=[
         "Development Status :: 4 - Beta",
