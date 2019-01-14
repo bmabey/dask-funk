@@ -3,6 +3,11 @@
 History
 -------
 
+0.9.2 (2019-01-14)
+---------------------
+
+* Fixes bug where ambiguous defaulted values resulted in an error in compilation of the dask
+
 0.9.1 (2015-10-05)
 ---------------------
 
