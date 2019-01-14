@@ -75,7 +75,7 @@ def compile(fn_graph, get=dask.get):
     for param_info in fn_param_info.values():
         for kw, value in param_info.items():
             if kw in global_param_info and global_param_info[kw] != value:
-                global_param_info = _AMBIGUOUS
+                global_param_info[kw] = _AMBIGUOUS
             else:
                 global_param_info[kw] = value
     computed_args = set(fn_graph.keys())
